@@ -30,14 +30,15 @@ fully_merged <- cbind(subject_data, activity, merged_data)
 library(dplyr)
 filtered_features <- filter(features,(grepl("std()",names(merged_data))|grepl("mean()",names(merged_data))),!(grepl("meanFreq",names(merged_data))))
 filtered_data <- merged_data[,filtered_features[,1]]
-
+# Adding Subject and Activity column
+filtered_data <- cbind(subject_data, activity, filtered_data)
 # 3. Uses descriptive activity names to name the activities in the data set
 activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt")
-merged_data$Activity <- factor(merged_data$Activity,
+filtered_data$Activity <- factor(filtered_data$Activity,
                     levels = c(1,2,3,4,5,6),
                     labels = activity_labels[,2]) 
 # 4. Appropriately labels the data set with descriptive variable names.
   # See labeling above in #1 and desciption in features_list.txt
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
+tidy_data <- filtered_data %>% group_by(Subject) %>%  group_by(Activity) %>% summarise_each(funs(mean))
